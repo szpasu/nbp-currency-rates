@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+        app:
+                build:
+                        context: ./
+                        dockerfile: Dockerfile
+                image: currencyrates
+                container_name: currencyrates-app
+                restart: unless-stopped
+                working_dir: /var/www
+                volumes:
+                        - ./:/var/www
+                networks:
+                        - currencyrates
+
+        db:
+                image: mysql:5.7
+                container_name: currencyraets-db
+                restart: unless-stopped
+                environment: 
+                        MYSQL_DATABASE: currencyrates
+                        MYSQL_ROOT_PASSWORD: root
+                        MYSQL_PASSWORD: root
+                        MYSQL_USER: root
+                        SERVICE_TAGS: dev
+                        SERVICE_NAME: mysql
+                networks:
+                        - currencyrates
+
+        nginx:
+                image: nginx:1.17-alpine
+                container_name: currencyrates-nginx
+                restart: unless-stopped
+                ports:
+                        - 8000:80
+                volumes:
+                        - ./:/var/www
+                        - ./docker-compose/nginx:/etc/nginx/conf.d
+                networks:
+                        - currencyrates
+        
+networks:
+        currencyrates:
+                driver: bridge
+
